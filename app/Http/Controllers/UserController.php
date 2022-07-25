@@ -14,9 +14,9 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return User::paginate(10);
     }
 
     /**
@@ -29,6 +29,11 @@ class UserController extends Controller
     {
         $user = User::create($request->all());
 
+        if (!$user) {
+            return response()->json([
+                'error' => ['message' => ['Erro ao cadastrar usuário']],
+            ], Response::HTTP_NOT_FOUND);
+        }
         return $user;
     }
 
@@ -40,7 +45,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'error' => ['message' => ['Usuário não encontrado']],
+            ], Response::HTTP_NOT_FOUND);
+        }
+        return User::find($id);
     }
 
     /**
@@ -52,7 +63,16 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'error' => ['message' => ['Usuário não encontrado']],
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $user->update($request->all());
+
+        return $user;
     }
 
     /**
@@ -63,7 +83,17 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::find($id);
+        
+        if (!$user) {
+            return response()->json([
+                'error' => ['message' => ['Usuário não encontrado']],
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'Usuário deletado com sucesso'], Response::HTTP_OK);
     }
 
     public function logout(){
